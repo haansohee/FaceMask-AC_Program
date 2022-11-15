@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from PIL import ImageFont, ImageDraw, Image
 from modelData import *
+import dlib
 
 # 이미지 전처리 함수
 def preprocessing(image) :
@@ -19,8 +20,12 @@ def preprocessing(image) :
     return image_normalized
 
 def faceDetect(gray, image):
-    # 얼굴 인식 실행하기
-    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.05, minNeighbors=5, minSize=(100, 100), flags=cv2.CASCADE_SCALE_IMAGE)
+    # 얼굴 인식 실행하기 (haar 이용)
+    faces = face_cascade.detectMultiScale(gray,
+                                          scaleFactor=1.05,
+                                          minNeighbors=5,
+                                          minSize=(100, 100),
+                                          flags=cv2.CASCADE_SCALE_IMAGE)
     # detect 성공
     if len(faces) > 0:
         # 얼굴에 사각형 그리고 눈 찾기
@@ -41,10 +46,12 @@ def faceDetect(gray, image):
             # 눈 찾기 실패
             else:
                 print("!!!no eyes!!!")
+                cv2.putText(image, "no eyes", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
                 return image, False
     # 얼굴 detect 실패
     else:
         print("!!!no face!!!")
+        cv2.putText(image, "no face", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         return image, False
 
 # cv2.putText 시 한글 깨짐 방지 함수
@@ -65,62 +72,67 @@ def font(image, name):
     return img_cv2
 
 while True:
-    # 종료
-    if cv2.waitKey(200) > 0:
-        break
-
     # camera 이미지 가져오기
     ret, image = camera.read()
     image_fliped = cv2.flip(image, 1)  # 이미지 좌우반전
 
+    # 종료
+    if cv2.waitKey(200) > 0:
+        break
+
     # 이미지 전처리
     preprocessed = preprocessing(image_fliped)
+
 
     # image_fliped를 그레이스케일로 변환하여서
     gray = cv2.cvtColor(image_fliped, cv2.COLOR_BGR2GRAY)
     # Detect (얼굴 검출) 하기
-    image_fliped, result = fa ceDetect(gray, image_fliped)  # result -> Boolean
-    if result == False:
-        continue
+    canvas, result = faceDetect(gray, image_fliped)  # result -> Boolean
 
-    # 현재 이미지가 무엇인지 예측. (모델 예측) -> 카메라 속 인물이 누구인지!
-    # 백분율 배열을 반환. (예:[0.2,0.8]은 20% 확신을 의미)
-    # 첫 번째 레이블이고, 80%가 두 번째 레이블이라고 확신
-    probabilities = model.predict(preprocessed)
+    if result == True:
+        # 현재 이미지가 무엇인지 예측. (모델 예측) -> 카메라 속 인물이 누구인지!
+        # 백분율 배열을 반환. (예:[0.2,0.8]은 20% 확신을 의미)
+        # 첫 번째 레이블이고, 80%가 두 번째 레이블이라고 확신
+        probabilities = model.predict(preprocessed)
 
-    # 확률이 가장 높은 label을 maxProb변수에 저장하기.
-    maxProb = labels[np.argmax(probabilities)]
-    # labels에서 이름만 따로 저장 (인덱스, (학번_이름))이니까 1번째
-    name = maxProb.split()[1]
+        # 확률이 가장 높은 label을 maxProb변수에 저장하기.
+        maxProb = labels[np.argmax(probabilities)]
+        # labels에서 이름만 따로 저장 (인덱스, (학번_이름))이니까 1번째
+        name = maxProb.split()[1]
+        index = maxProb.split()[0]
 
-    # 출력하여 확인하기
-    print(maxProb)
-    print(name)
-    print(np.max(probabilities))
+        if index == 14 or index == 15:
+            print("외부인입니다. 인식을 재시도합니다.")
+            continue
 
-    # 정확도가 가장 높은 값이 0.5 이하인지 확인
-    if np.max(probabilities) < 0.6:
-        print("정확도가 낮습니다. 다시 측정합니다.")
-        continue
-    else:
-        for i in range(0, 16):
-            # print('name: ' + name)
-            # print("stuName[i]: " + stuName[i])
-            # if name == stuName[14] or name == stuName[15]:
-            #     print("외부인입니다. 다시 인식 시도.")
-            #     continue
-            if name == stuName[i]:
-                print(name, "학생의 출석이 인증되었습니다.")
-                print("SQL문 실행")
-                sql = "UPDATE FaceMask SET Whether = 'OK' WHERE id = " + "'" + stuNum[i] + "'"
-                print(sql)
-                # cur.execute(sql)
-                # conn.commit()  # 입력한 데이터 저장
+        # 출력하여 확인하기
+        print(maxProb)
+        print(name)
+        print(np.max(probabilities))
 
-                image_fliped = font(image_fliped, name)
+        # 정확도가 가장 높은 값이 0.5 이하인지 확인
+        if np.max(probabilities) < 0.6:
+            print("정확도가 낮습니다. 다시 측정합니다.")
+            continue
 
+        else:
+            for i in range(0, 16):
+                # print('name: ' + name)
+                # print("stuName[i]: " + stuName[i])
+                # if name == stuName[14] or name == stuName[15]:
+                #     print("외부인입니다. 다시 인식 시도.")
+                #     continue
+                if name == stuName[i]:
+                    print(name, "학생의 출석이 인증되었습니다.")
+                    print("SQL문 실행")
+                    sql = "UPDATE FaceMask SET Whether = 'OK' WHERE id = " + "'" + stuNum[i] + "'"
+                    print(sql)
+                    # cur.execute(sql)
+                    # conn.commit()  # 입력한 데이터 저장
 
-    cv2.imshow("web cam", image_fliped)
+                    canvas = font(canvas, name)
+
+    cv2.imshow("web cam", canvas)
 
 # sql = "select * from FaceMask"
 # cur.execute(sql)
