@@ -3,11 +3,11 @@ from keras.models import load_model
 import pymysql
 
 # 모델 불러오기
-model = load_model('../model/keras_model.h5')
+model = load_model('../model/keras_model_5000.h5')
 
 # haar 분류기 불러오기 (모델 불러오기)
-face_cascade = cv2.CascadeClassifier('../model/haarcascade_frontalface_default.xml')  # 얼굴
-eye_cascade = cv2.CascadeClassifier('../model/haarcascade_eye.xml')  # 눈
+# face_cascade = cv2.CascadeClassifier('../model/haarcascade_frontalface_default.xml')  # 얼굴
+# eye_cascade = cv2.CascadeClassifier('../model/haarcascade_eye.xml')  # 눈
 
 # 카메라 캡처 객체 0 -> 내장카메라
 camera = cv2.VideoCapture(0)
