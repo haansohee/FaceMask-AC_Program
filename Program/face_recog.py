@@ -1,8 +1,12 @@
+import gc
+
 import cv2
 import numpy as np
 import cvlib as cv
 from PIL import ImageFont, ImageDraw, Image
 from modelData import *
+from time import sleep
+
 
 # 이미지 전처리 함수
 def preprocessing(image) :
@@ -15,7 +19,7 @@ def preprocessing(image) :
     image_reshaped = np.array(image_resized, dtype=np.float32).reshape(1, 224, 224, 3)
 
     # 이미지 정규화
-    image_normalized = (image_reshaped / 127.5) - 1
+    image_normalized  = (image_reshaped / 127.5) - 1
 
     return image_normalized
 
@@ -76,7 +80,10 @@ while True:
     # Detect (얼굴 검출) 하기
     canvas, detectImage, result = faceDetect(image_fliped)
 
-    if result == True:
+    sleep(0.5)   # 시간 지연
+
+    while result:
+
         # 이미지 전처리
         preprocessed = preprocessing(detectImage)
 
@@ -87,40 +94,57 @@ while True:
 
         # 확률이 가장 높은 label을 maxProb변수에 저장하기.
         maxProb = labels[np.argmax(probabilities)]
-        # labels에서 이름만 따로 저장 (인덱스, (학번_이름))이니까 1번째
-        name = maxProb.split()[1]
-        index = maxProb.split()[0]
+        # labels에서 이름만 따로 저장 (인덱스, (학번_이름))
+        name = maxProb.split()[1]  # 학번_이름
+        index = name.split('_')[0]   # 학번
 
-        if index == 14 or index == 15:
-            print("외부인입니다. 인식을 재시도합니다.")
-            continue
+        canvas = font(canvas, name)
 
         # 출력하여 확인하기
-        print(maxProb)
-        print(name)
-        print(np.max(probabilities))
+        # print(maxProb)
+        # print(name)
+        # print("인증 중인 학생의 학번 : ", index)
+        # print(np.max(probabilities))
 
-        # 정확도가 가장 높은 값이 0.5 이하인지 확인
-        if np.max(probabilities) < 0.6:
+        if check == 3 :
+            falseNum = input("인식에 실패하였습니다. 학번을 기입하십시오. (단, 외부인은 기입 금지.) : ")
+            sql = "UPDATE FaceMask SET whether = '확인요망', dateTime = " + today + " WHERE id = " + "'" + falseNum + "'"
+
+            if falseNum in log:
+                print(falseNum + " 학번의 학생은 이미 출석 인증을 완료하였습니다.")
+                check = 0
+                break
+
+            log.append(falseNum)
+            log = list(set(log))
+            print(sql)
+            check = 0
+            cur.execute(sql)
+            conn.commit()  # 입력한 데이터 저장
+            break
+
+        # 외부인으로 인식될 시
+        if index == '101' or index == '102':
             print("정확도가 낮습니다. 다시 측정합니다.")
-            continue
+            check += 1
+            break
 
-        else:
-            for i in range(0, 16):
-                # print('name: ' + name)
-                # print("stuName[i]: " + stuName[i])
-                # if name == stuName[14] or name == stuName[15]:
-                #     print("외부인입니다. 다시 인식 시도.")
-                #     continue
-                if name == stuName[i]:
-                    print(name, "학생의 출석이 인증되었습니다.")
-                    print("SQL문 실행")
-                    sql = "UPDATE FaceMask SET Whether = 'OK' WHERE id = " + "'" + stuNum[i] + "'"
-                    print(sql)
-                    # cur.execute(sql)
-                    # conn.commit()  # 입력한 데이터 저장
+        # 이미 출석 인증을 한 수강생일 시
+        if index in log:
+            print(name + " 학생은 이미 출석 인증을 완료하였습니다.")
+            break
 
-                    canvas = font(canvas, name)
+        print(name, "학생의 출석이 인증되었습니다.")
+        print("SQL문 실행")
+        sql = "UPDATE FaceMask SET whether = '출석', dateTime = " + today + " WHERE id = " + "'" + index + "'"
+        print(sql)
+        cur.execute(sql)
+        conn.commit()  # 입력한 데이터 저장
+
+        log.append(index)
+        log = list(set(log))
+
+        break
 
     cv2.imshow("web cam", canvas)
 
@@ -129,6 +153,6 @@ while True:
 # rows = cur.fetchall()
 # print(rows)
 
-# conn.close()
+conn.close()
 camera.release()
 cv2.destroyAllWindows()

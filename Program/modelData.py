@@ -1,13 +1,18 @@
+from datetime import date
+
 import cv2
 from keras.models import load_model
 import pymysql
 
-# 모델 불러오기
-model = load_model('../model/keras_model_5000.h5')
+check = 0  # 수강생의 외부인 인식과 얼굴 인식 안 됐을 경우의 카운트를 세기 위함. i가 2면 확인 요망.
+# 출석 인증 하는 날짜(당일) 가져오기
+todayDate = date.today()
+today = todayDate.strftime("%Y%m%d")
 
-# haar 분류기 불러오기 (모델 불러오기)
-# face_cascade = cv2.CascadeClassifier('../model/haarcascade_frontalface_default.xml')  # 얼굴
-# eye_cascade = cv2.CascadeClassifier('../model/haarcascade_eye.xml')  # 눈
+print(today)
+
+# 모델 불러오기
+model = load_model('../model/keras_model_7500.h5')
 
 # 카메라 캡처 객체 0 -> 내장카메라
 camera = cv2.VideoCapture(0)
@@ -22,7 +27,7 @@ print(labels)  # label 출력해서 확인
 
 stuNameTest = labels.copy()  # 이름만 따로 저장하려고 원본 복사해 오기
 stuNumTest = labels.copy()
-stuName = []  # 이름_학번 저장할 리스트 -> 출결 처리 시 사용
+stuName = []  # 학번_이름 저장할 리스트 -> 출결 처리 시 사용
 stuNum = []  # 학번만 저장할 리스트 -> sql 쿼리문에서 사용
 
 for i in range(0, 16):
@@ -45,8 +50,8 @@ log = []  # 출결 처리 된 수강생은 쿼리문 실행 X => 서버 과부�
 
 
 # 데이터베이스 서버에 연결, 정상적으로 연결이 수립되면 커넥션 객체를 반환
-# conn = pymysql.connect(host='localhost', user='sohee', password = 'wnsgur0702',
-#                        db='FaceMask_Program', charset = 'utf8')  # charset = 'utif8' => 한글 처리
-#
-# # 커서 생성.
-# cur = conn.cursor()
+conn = pymysql.connect(host='localhost', user='sohee', password = 'wnsgur0702',
+                       db='FaceMask_Program', charset = 'utf8')  # charset = 'utif8' => 한글 처리
+
+# 커서 생성.
+cur = conn.cursor()

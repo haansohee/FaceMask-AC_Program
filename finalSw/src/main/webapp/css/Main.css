@@ -1,0 +1,65 @@
+.container{
+	height:100%; width:100%;
+	 margin: 0;
+  	background: linear-gradient(45deg, #49a09d, #5f2c82);
+  	font-family: sans-serif;
+  	font-weight: 100;
+}
+table {
+  width: 800px;
+  border-collapse: collapse;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+th,
+td {
+  text-align: center;
+  padding: 15px;
+  background-color: rgba(255,255,255,0.2);
+  color: #fff;
+  position: relative;
+}
+
+th {
+  text-align: center;
+  background-color : rgb(85,96,143);
+}
+tr:hover {
+  background-color: rgba(255,255,255,0.3);
+}
+.header{
+	width:100%;
+	height: 100px;
+	position: relative;
+}
+.header > button{
+	position: absolute;
+}
+.check{
+	left:400px;
+	top: 35px;
+}
+.update{
+	left:550px;
+	top: 35px;
+}
+.signUp{
+	left:1000px;
+	top: 35px;
+}
+.login{
+	left:800px;
+	top: 35px;
+}
+#logOut{
+	left:850px;
+	top: 35px;
+}
+#member_delete{
+	left:1000px;
+	top: 35px;
+}
+.member_update{
+	left:700px;
+	top: 35px;
+}
