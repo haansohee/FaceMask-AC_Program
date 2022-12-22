@@ -21,14 +21,21 @@
 
 <b>개발 언어 및 라이브러리 </b>
 
-프로그램 언어 : Python3.8, JSP<br>
-IDE : Pycharm, Eclipse <br>
-Database : MySQL <br>
-라이브러리 및 패키지 : OpenCV, Numpy, Keras, PIL, JDK <br>
-서버 : Apache Tomcat v9.0 <br>
-가상 환경 : Conda <br>
+<table>
+  <tr><td> 프로그램 언어  <td> Python 3.8, JSP </td></tr>
+    <tr><td> IDE  </td> <td> Pycharm, Eclipse  </td></tr>
+	<tr><td> Database </td> <td> MySQL </td> </tr>
+	<tr><td> 라이브러리 및 패키지 </td> <td>OpenCV, Numpy, Keras, PIL, JDK  </td> </tr>
+	<tr><td> 서버 </td> <td> Apache Tomcat v9.0 </td> </tr>
+	<tr><td> 가상환경 </td> <td> Conda </td> </tr>
+  </table>
+
+<br>
+
+## 3. 시스템 구성 및 아키텍처
+<b> 영상 처리 프로그램 </b>
+
+<img src = "/Users/hansohee/inhatc/2-2/sw/VideoProgram.png"/>
 
 
-
-
-<a href="https://velog.io/@haansohee/SW-프로젝트-준비-과정-1"> 프로젝트 준비 과정 </a>
+<a href="https://velog.io/@haansohee/SW-프로젝트-준비-과x정-1"> 프로젝트 준비 과정 </a>
