@@ -8,7 +8,13 @@
 
 <br>
 
-## 2. 개발 환경 및 개발 언어
+## 2. 계획
+
+<img width="770" alt="plan" src="https://user-images.githubusercontent.com/90755590/209362548-281fdf5d-99f4-4d49-b590-7b9e05d1aeb5.png">
+
+<br>
+
+## 3. 개발 환경 및 개발 언어
 <b>운영체제</b>
 <table>
   <tr><td> 프로세서 <td> Apple M1 pro  </td></tr>
@@ -32,18 +38,22 @@
 
 <br>
 
-## 3. 시스템 구성 및 아키텍처
+## 4. 시스템 구성 및 아키텍처
 <b> 영상 처리 프로그램 </b>
 
-<img src = "/Users/hansohee/inhatc/2-2/sw/VideoProgram.png"/>
+![VideoProgram](https://user-images.githubusercontent.com/90755590/209362359-d2fe08a0-8c2a-4cb7-8d51-a901eeb5f592.png)
+
+<br>
+
+<b> 웹 페이지 </b>
+
+![WebProgram](https://user-images.githubusercontent.com/90755590/209362444-ab83bd38-11d7-4a51-b45e-fb093c1fc5a9.png)
+
 
 
 <a href="https://velog.io/@haansohee/SW-프로젝트-준비-과x정-1"> 프로젝트 준비 과정 </a>
 
-<br>
 
-## 4. 목표 계획
-<img src ="">
 
 <br>
 
